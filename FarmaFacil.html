@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Farma Fácil - Gestão 3.0</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+
+    <style>
+      /* --- VARIÁVEIS DE TEMA --- */
+      :root {
+        --bg-body: #1e1e1e;
+        --bg-card: #2c2c2c;
+        --bg-sidebar: #252525;
+        --accent-purple: #6f42c1;
+        --accent-purple-hover: #5a32a3;
+        --text-main: #f0f0f0;
+        --text-muted: #aaaaaa;
+        --input-bg: #f5f5f5;
+        --border-color: #444;
+      }
+
+      body.light-mode {
+        --bg-body: #f4f6f9;
+        --bg-card: #ffffff;
+        --bg-sidebar: #e9ecef;
+        --accent-purple: #6f42c1;
+        --text-main: #212529;
+        --text-muted: #6c757d;
+        --input-bg: #e9ecef;
+        --border-color: #dee2e6;
+      }
+
+      body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        transition: background-color 0.4s ease, color 0.4s ease;
+      }
+
+      /* --- SELEÇÃO DE TEXTO --- */
+      ::selection {
+        background-color: var(--accent-purple);
+        color: #ffffff;
+      }
+      input::selection,
+      textarea::selection {
+        background-color: #333;
+        color: #ffffff;
+      }
+
+      /* --- SIDEBAR --- */
+      .sidebar {
+        height: 100vh;
+        background-color: var(--bg-sidebar);
+        border-right: 1px solid var(--border-color);
+        padding-top: 20px;
+        overflow-y: auto;
+      }
+
+      .brand-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 30px;
+        color: var(--text-main);
+      }
+
+      /* Informação do usuário logado */
+      .user-info {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 40px;
+        padding: 0 15px;
+      }
+      .user-info strong {
+        color: var(--text-main);
+        font-size: 1.1rem;
+        display: block;
+      }
+
+      .nav-link {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        border-radius: 10px;
+        padding: 10px 15px;
+        transition: all 0.3s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .nav-link:hover {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-link.active {
+        background-color: transparent;
+        color: #ffffff !important;
+        font-weight: bold;
+        border: 1px solid var(--border-color);
+      }
+
+      .nav-sub-item {
+        margin-left: 25px;
+        font-size: 0.95rem;
+        display: none;
+        animation: slideDown 0.3s ease forwards;
+        border: none !important;
+      }
+
+      .nav-sub-item.active-sub {
+        display: flex;
+        background-color: var(--accent-purple);
+        color: white !important;
+        box-shadow: 0 4px 10px rgba(111, 66, 193, 0.4);
+        font-weight: 500;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* --- CONTEÚDO PRINCIPAL --- */
+      .main-content {
+        padding: 30px;
+        height: 100vh;
+        overflow-y: auto;
+      }
+
+      /* Layout centralizado para Configurações */
+      .center-layout {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+      .config-container {
+        width: 100%;
+        max-width: 600px; /* Limita a largura dos cartões centralizados */
+      }
+
+      .custom-card {
+        background-color: var(--bg-card);
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-control-custom,
+      .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 10px 15px;
+        color: #333;
+      }
+
+      /* Estilo específico para campos de leitura (Detalhes) */
+      .detail-label {
+        color: var(--text-main);
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+      }
+      .detail-value {
+        background-color: #f5f5f5;
+        color: #000;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        display: block;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Lista de Busca Customizada */
+      .list-group-item-custom {
+        background-color: #f5f5f5;
+        color: #000;
+        border: none;
+        margin-bottom: 10px;
+        border-radius: 8px !important;
+        font-weight: 600;
+        padding: 15px;
+        transition: transform 0.2s;
+        cursor: pointer;
+      }
+      .list-group-item-custom:hover {
+        transform: scale(1.01);
+        background-color: #e9ecef;
+      }
+      .arrow-btn {
+        color: #000;
+        font-size: 1.5rem;
+        transition: color 0.2s;
+      }
+      .arrow-btn:hover {
+        color: var(--accent-purple);
+      }
+
+      /* Tabela */
+      .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table-custom th,
+      .table-custom td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+      }
+      body:not(.light-mode) .table-custom {
+        color: #ffffff !important;
+      }
+      body.light-mode .table-custom {
+        color: #212529 !important;
+        border-color: #dee2e6;
+      }
+
+      .fade-in-anim {
+        animation: fadeIn 0.4s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      
+      .bg-dark label.text-muted,
+      .bg-dark h6,
+      .bg-dark ul li {
+        color: #ffffff !important;
+      }
+      .bg-dark h6 {
+        border-color: rgba(255, 255, 255, 0.5) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse show">
+          <div class="position-sticky pt-3">
+            <div class="brand-title">Farma Fácil</div>
+
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  id="nav-busca"
+                  onclick="showScreen('busca')"
+                >
+                  <i class="bi bi-search"></i> Consulta e Busca
+                </a>
+                <a class="nav-link nav-sub-item" id="nav-detalhes">
+                  <i class="bi bi-file-text"></i> Detalhes
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="nav-painel"
+                  onclick="showScreen('painel')"
+                >
+                  <i class="bi bi-grid-3x3-gap"></i> Painel de Controle
+                </a>
+                <a class="nav-link nav-sub-item" id="nav-cadastro">
+                  <i class="bi bi-plus-circle"></i> Cadastrar
+                </a>
+                <a class="nav-link nav-sub-item" id="nav-atualizacao">
+                  <i class="bi bi-pencil-square"></i> Formulário de atualização
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="nav-config"
+                  onclick="showScreen('config')"
+                >
+                  <i class="bi bi-gear"></i> Configurações
+                </a>
+              </li>
+            </ul>
+
+            <div class="user-info">
+              Logado como:
+              <strong id="sidebarUserName">Maria Jose</strong>
+            </div>
+          </div>
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+          <section id="screen-busca" class="fade-in-anim">
+            <h3 class="mb-4">Consulta Rápida</h3>
+            <div class="custom-card">
+              <input
+                type="text"
+                class="form-control mb-4"
+                placeholder="Digite o nome do medicamento..."
+                id="inputBuscaPrincipal"
+              />
+              <div class="list-group" id="listaMedicamentosContainer"></div>
+            </div>
+          </section>
+
+          <section id="screen-detalhes" class="d-none fade-in-anim">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4><i class="bi bi-info-circle text-primary"></i> Detalhes</h4>
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                onclick="showScreen('busca')"
+              >
+                Voltar para Busca
+              </button>
+            </div>
+
+            <div
+              class="custom-card"
+              style="background-color: #f2eefc; color: #333"
+            >
+              <h3 class="mb-4 fw-bold" id="detail-title">
+                Ibuprofeno (Exemplo)
+              </h3>
+
+              <div class="row">
+                <div class="col-md-7">
+                  <div class="p-3 bg-dark rounded text-white">
+                    <div class="mb-2">
+                      <label class="small text-muted">EAN:</label>
+                      <div
+                        class="bg-white text-dark rounded px-2 py-1"
+                        id="view-ean"
+                      >
+                        --
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="small text-muted">Laboratório:</label>
+                      <div
+                        class="bg-white text-dark rounded px-2 py-1"
+                        id="view-lab"
+                      >
+                        --
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="small text-muted">Princípio Ativo:</label>
+                      <div
+                        class="bg-white text-dark rounded px-2 py-1"
+                        id="view-principio"
+                      >
+                        --
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="small text-muted">Dosagem:</label>
+                      <div
+                        class="bg-white text-dark rounded px-2 py-1"
+                        id="view-categoria"
+                      >
+                        --
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-6 mb-2">
+                        <label class="small text-muted">Qtd:</label>
+                        <div
+                          class="bg-white text-dark rounded px-2 py-1"
+                          id="view-qtd"
+                        >
+                          --
+                        </div>
+                      </div>
+                      <div class="col-6 mb-2">
+                        <label class="small text-muted">Status:</label>
+                        <div
+                          class="bg-white text-dark rounded px-2 py-1"
+                          id="view-status"
+                        >
+                          --
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-5">
+                  <div class="bg-dark text-white p-3 rounded h-100">
+                    <h6 class="border-bottom pb-2 mb-3">Para que serve:</h6>
+                    <ul class="small ps-3 mb-4" id="view-indicacao">
+                      <li>Carregando...</li>
+                    </ul>
+
+                    <h6 class="border-bottom pb-2 mb-3">Contra-indicação:</h6>
+                    <ul class="small ps-3" id="view-contra">
+                      <li>Carregando...</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 text-end">
+                <span class="badge bg-dark p-2">Farmácia: Farmácia 01</span>
+              </div>
+            </div>
+          </section>
+
+          <section id="screen-painel" class="d-none fade-in-anim">
+            <h3 class="mb-4">Monitoramento de Estoque</h3>
+
+            <div class="row mb-4">
+              <div class="col-md-4">
+                <div class="custom-card text-center">
+                  <h4>Total</h4>
+                  <span class="fs-2 fw-bold" id="stat-total">0</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="custom-card text-center">
+                  <h4>Críticos</h4>
+                  <span class="fs-2 fw-bold text-danger" id="stat-critico"
+                    >0</span
+                  >
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="custom-card text-center">
+                  <h4>Unidades</h4>
+                  <span class="fs-2 fw-bold text-success" id="stat-unidades"
+                    >0</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="custom-card">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <h5>Lista Geral</h5>
+                <div class="d-flex align-items-center gap-2">
+                  <button
+                    class="btn btn-sm btn-dark"
+                    onclick="showScreen('cadastro')"
+                  >
+                    <i class="bi bi-plus-circle"></i> Novo Medicamento
+                  </button>
+                  <input
+                    type="text"
+                    class="form-control w-25 form-control-sm"
+                    placeholder="Filtrar..."
+                    id="inputBuscaPainel"
+                  />
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table-custom">
+                  <thead>
+                    <tr>
+                      <th>Medicamento</th>
+                      <th>Dosagem</th>
+                      <th>Qtd. Atual</th>
+                      <th>Status</th>
+                      <th class="text-end">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabelaEstoqueBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="screen-cadastro" class="d-none fade-in-anim">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4>
+                <i class="bi bi-plus-circle text-success"></i> Cadastrar Novo
+                Medicamento
+              </h4>
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                onclick="showScreen('painel')"
+              >
+                Voltar
+              </button>
+            </div>
+            <div class="row">
+              <div class="col-md-8 mx-auto">
+                <div class="custom-card bg-white text-dark">
+                  <form id="formCadastro">
+                    <h6 class="border-bottom pb-2 mb-3">Dados Principais</h6>
+                    <div class="mb-3">
+                      <label class="fw-bold">Nome Comercial:</label
+                      ><input
+                        type="text"
+                        class="form-control"
+                        name="nome"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="fw-bold">EAN (Código de Barras):</label
+                      ><input
+                        type="text"
+                        class="form-control"
+                        name="ean"
+                        required
+                      />
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Laboratório:</label
+                        ><input
+                          type="text"
+                          class="form-control"
+                          name="laboratorio"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Princípio Ativo:</label
+                        ><input
+                          type="text"
+                          class="form-control"
+                          name="principio_ativo"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="fw-bold">Composição (Obrigatório):</label
+                      ><textarea
+                        class="form-control"
+                        name="composicao"
+                        rows="1"
+                        required
+                      ></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="fw-bold"
+                        >Forma de Administração (Obrigatório):</label
+                      >
+                      <select
+                        class="form-control"
+                        name="forma_administracao"
+                        required
+                      >
+                        <option value="" disabled selected>
+                          Selecione a Forma
+                        </option>
+                        <option value="Oral">Oral</option>
+                        <option value="Tópica">Tópica</option>
+                        <option value="Injetável">Injetável</option>
+                        <option value="Inalatória">Inalatória</option>
+                        <option value="Sublingual">Sublingual</option>
+                        <option value="Outra">Outra</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="fw-bold"
+                        >Armazenamento (Obrigatório):</label
+                      >
+                      <select
+                        class="form-control"
+                        name="armazenamento"
+                        required
+                      >
+                        <option value="" disabled selected>
+                          Selecione a Condição
+                        </option>
+                        <option value="Temperatura Ambiente">
+                          Temperatura Ambiente
+                        </option>
+                        <option value="Refrigerado (2°C a 8°C)">
+                          Refrigerado (2°C a 8°C)
+                        </option>
+                        <option value="Congelado (abaixo de 0°C)">
+                          Congelado (abaixo de 0°C)
+                        </option>
+                        <option value="Proteger da Luz">Proteger da Luz</option>
+                      </select>
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mt-4 mb-3">
+                      Detalhes, Dosagem e Estoque
+                    </h6>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold"
+                          >Para que serve (Indicação):</label
+                        ><textarea
+                          class="form-control"
+                          name="para_que_serve"
+                          rows="2"
+                        ></textarea>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Contraindicação:</label
+                        ><textarea
+                          class="form-control"
+                          name="contraindicacao"
+                          rows="2"
+                        ></textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Dosagem (Ex: 500mg):</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="dosagem"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Qtd. Inicial:</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          name="quantidade"
+                          min="0"
+                          required
+                          value="0"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      class="btn btn-success w-100 py-2 mt-4"
+                    >
+                      <i class="bi bi-check-circle"></i> Cadastrar Medicamento
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="screen-atualizacao" class="d-none fade-in-anim">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4>
+                <i class="bi bi-pencil-square text-primary"></i> Editando:
+                <span id="update-med-name"></span>
+              </h4>
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                onclick="showScreen('painel')"
+              >
+                Voltar
+              </button>
+            </div>
+            <div class="row">
+              <div class="col-md-8 mx-auto">
+                <div class="custom-card bg-white text-dark">
+                  <form id="formAtualizar">
+                    <input type="hidden" name="id" />
+                    <h6 class="border-bottom pb-2 mb-3">Dados Principais</h6>
+                    <div class="mb-3">
+                      <label class="fw-bold">Nome:</label
+                      ><input
+                        type="text"
+                        class="form-control"
+                        name="nome"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="fw-bold">EAN:</label
+                      ><input
+                        type="text"
+                        class="form-control"
+                        name="ean"
+                        required
+                      />
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Laboratório:</label
+                        ><input
+                          type="text"
+                          class="form-control"
+                          name="laboratorio"
+                        />
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Princípio Ativo:</label
+                        ><input
+                          type="text"
+                          class="form-control"
+                          name="principio"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="fw-bold">Composição (Obrigatório):</label>
+                      <textarea
+                        class="form-control"
+                        name="composicao_upd"
+                        rows="1"
+                        required
+                      ></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="fw-bold"
+                        >Forma de Administração (Obrigatório):</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="forma_administracao_upd"
+                        required
+                      />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="fw-bold"
+                        >Armazenamento (Obrigatório):</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="armazenamento_upd"
+                        required
+                      />
+                    </div>
+                    <h6 class="border-bottom pb-2 mt-4 mb-3">
+                      Detalhes de Estoque
+                    </h6>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Qtd. Estoque:</label
+                        ><input
+                          type="number"
+                          class="form-control"
+                          name="quantidade"
+                          min="0"
+                          required
+                          readonly
+                        />
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Dosagem:</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="categoria_upd"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100 py-2 mt-3">
+                      Salvar Alterações
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="screen-config" class="d-none fade-in-anim h-100">
+            <div class="center-layout">
+              <h3 class="mb-4">Configurações</h3>
+
+              <div class="config-container">
+                <div class="custom-card mb-4">
+                  <h5>Aparência</h5>
+                  <div class="form-check form-switch mt-3">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="checkDark"
+                      checked
+                      onchange="toggleTheme('dark')"
+                    /><label class="form-check-label">Tema Escuro</label>
+                  </div>
+                  <div class="form-check form-switch mt-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="checkLight"
+                      onchange="toggleTheme('light')"
+                    /><label class="form-check-label">Tema Claro</label>
+                  </div>
+                </div>
+
+                <div class="custom-card bg-light text-dark">
+                  <div class="d-flex justify-content-between mb-3">
+                    <h5 class="d-flex align-items-center gap-2">
+                      Perfil <i class="bi bi-person-circle"></i>
+                    </h5>
+                    <button class="btn btn-dark btn-sm">Editar</button>
+                  </div>
+                  <form id="formPerfil">
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Usuário:</label
+                      ><input
+                        type="text"
+                        class="form-control"
+                        id="profileNome"
+                        value="Maria Jose"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">E-mail:</label
+                      ><input
+                        type="email"
+                        class="form-control"
+                        id="profileEmail"
+                        value="MariaJose.Silva@gmail.com"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Senha:</label
+                      ><input
+                        type="password"
+                        class="form-control"
+                        id="profilePass"
+                        placeholder="***************"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Confirmar senha:</label
+                      ><input
+                        type="password"
+                        class="form-control"
+                        id="profileConfirmPass"
+                        placeholder="***************"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      class="btn btn-dark w-100 rounded-pill mt-2"
+                    >
+                      Salvar Alterações
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // --- CONFIGURAÇÃO DA API ---
+      const API_BASE_URL = "http://localhost:5000/api";
+
+      // Variável global para armazenar o estado atual da aplicação
+      let dbMedicamentos = [];
+
+      // --- 1. UTILS ---
+      function escapeHtml(text) {
+        if (!text) return "";
+        return text
+          .toString()
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      
+      function calcularStatus(qtd) {
+        if (qtd < 10) return "Repor";
+        if (qtd < 50) return "Atenção";
+        return "Normal";
+      }
+
+      // --- 2. INTEGRAÇÃO COM API (CORE) ---
+
+      
+      async function carregarDadosAPI() {
+        try {
+          // 1. Busca os Medicamentos
+          const resMed = await fetch(`${API_BASE_URL}/medicamentos`);
+          const listaMeds = await resMed.json();
+
+          // 2. Busca o Estoque Completo
+          const resEstoque = await fetch(`${API_BASE_URL}/estoque`);
+          const listaEstoque = await resEstoque.json();
+
+          // 3. Mescla os dados
+          dbMedicamentos = listaMeds.map((med) => {
+            // Soma a quantidade de estoque de todas as farmácias
+            const totalEstoque = listaEstoque
+              .filter((e) => e.medicamento_id === med.id)
+              .reduce((acc, curr) => acc + curr.quantidade, 0);
+
+            return {
+              id: med.id,
+              nome: med.nome,
+              ean: med.ean,
+              lab: med.laboratorio,
+              principio: med.principio_ativo,
+              qtd: totalEstoque,
+              categoria: med.dosagem || "Geral",
+              status: calcularStatus(totalEstoque),
+              indicacao: [med.para_que_serve],
+              contra: [med.contraindicacao],
+              composicao: med.composicao || "N/A",
+              forma_administracao: med.forma_administracao || "N/A",
+              armazenamento: med.armazenamento || "N/A",
+            };
+          });
+
+          // Atualiza a interface
+          renderListaBusca();
+          renderTabelaPainel();
+          atualizarEstatisticas();
+        } catch (error) {
+          console.error("Erro ao conectar com a API:", error);
+          document.getElementById("stat-total").innerText = "-";
+        }
+      }
+
+      // --- 3. NAVEGAÇÃO ---
+      function showScreen(screenName) {
+        document.querySelectorAll("section").forEach((el) => {
+          el.classList.add("d-none");
+          el.classList.remove("fade-in-anim");
+        });
+
+        const target = document.getElementById("screen-" + screenName);
+        if (target) {
+          target.classList.remove("d-none");
+          void target.offsetWidth;
+          target.classList.add("fade-in-anim");
+        }
+
+        // Reset Navegação Visual
+        document
+          .querySelectorAll(".nav-link")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-sub-item")
+          .forEach((el) => el.classList.remove("active-sub"));
+        document.getElementById("nav-busca").classList.remove("text-white");
+        document.getElementById("nav-painel").classList.remove("text-white");
+
+        // Lógica de sub-páginas
+        if (screenName === "detalhes") {
+          document.getElementById("nav-busca").classList.add("text-white");
+          document.getElementById("nav-detalhes").classList.add("active-sub");
+        } else if (screenName === "atualizacao") {
+          document.getElementById("nav-painel").classList.add("text-white");
+          document
+            .getElementById("nav-atualizacao")
+            .classList.add("active-sub");
+        } else if (screenName === "cadastro") {
+          document.getElementById("nav-painel").classList.add("text-white");
+          document.getElementById("nav-cadastro").classList.add("active-sub");
+          document.getElementById("formCadastro").reset(); // Limpa o formulário ao abrir
+        } else {
+          const navId = "nav-" + screenName;
+          const navEl = document.getElementById(navId);
+          if (navEl) navEl.classList.add("active");
+        }
+
+        if (screenName === "busca" || screenName === "painel") {
+          carregarDadosAPI();
+        }
+      }
+
+      // --- 4. RENDERIZAÇÃO ---
+
+      function renderListaBusca(termo = "") {
+        const container = document.getElementById("listaMedicamentosContainer");
+        container.innerHTML = "";
+
+        const filtrados = dbMedicamentos.filter((m) =>
+          m.nome.toLowerCase().includes(termo.toLowerCase())
+        );
+
+        if (filtrados.length === 0) {
+          container.innerHTML =
+            "<div class='text-center text-muted mt-3'>Nenhum medicamento encontrado.</div>";
+          return;
+        }
+
+        filtrados.forEach((med) => {
+          container.innerHTML += `
+                <div class="list-group-item-custom d-flex justify-content-between align-items-center" onclick="abrirDetalhes(${
+                  med.id
+                })">
+                    <span class="fs-5">${escapeHtml(
+                      med.nome
+                    )} <small class="text-muted ms-2">(${
+            med.lab
+          })</small></span>
+                    <i class="bi bi-arrow-right-circle-fill arrow-btn fs-3"></i>
+                </div>
+             `;
+        });
+      }
+
+      function abrirDetalhes(id) {
+        const med = dbMedicamentos.find((m) => m.id === id);
+        if (!med) return;
+
+        document.getElementById("detail-title").innerText = med.nome;
+        document.getElementById("view-ean").innerText = med.ean;
+        document.getElementById("view-lab").innerText = med.lab;
+        document.getElementById("view-principio").innerText = med.principio;
+        document.getElementById("view-categoria").innerText = med.categoria;
+        document.getElementById("view-qtd").innerText = med.qtd;
+        document.getElementById("view-status").innerText = med.status;
+
+        const listaIndicacao = document.getElementById("view-indicacao");
+        listaIndicacao.innerHTML = "";
+        med.indicacao.forEach(
+          (i) =>
+            (listaIndicacao.innerHTML += `<li class="mb-2 text-justify">${i}</li>`)
+        );
+
+        const listaContra = document.getElementById("view-contra");
+        listaContra.innerHTML = "";
+        med.contra.forEach(
+          (c) =>
+            (listaContra.innerHTML += `<li class="mb-2 text-justify">${c}</li>`)
+        );
+
+        showScreen("detalhes");
+      }
+
+      function renderTabelaPainel(termo = "") {
+        const tbody = document.getElementById("tabelaEstoqueBody");
+        tbody.innerHTML = "";
+
+        const filtrados = dbMedicamentos.filter((m) =>
+          m.nome.toLowerCase().includes(termo.toLowerCase())
+        );
+
+        const cores = {
+          Repor: "bg-danger",
+          Atenção: "bg-warning",
+          Normal: "bg-success",
+        };
+
+        filtrados.forEach((med) => {
+          tbody.innerHTML += `
+                <tr>
+                    <td>${escapeHtml(med.nome)}</td>
+                    <td>${escapeHtml(med.categoria)}</td>
+                    <td>${med.qtd} un</td>
+                    <td><span class="badge ${
+                      cores[med.status] || "bg-secondary"
+                    }">${med.status}</span></td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-dark me-2" onclick="abrirEdicao(${
+                          med.id
+                        })" title="Editar">
+                             <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deletarMedicamento(${
+                          med.id
+                        }, '${escapeHtml(med.nome)}')" title="Excluir">
+                             <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        atualizarEstatisticas();
+      }
+
+      // --- 5. AÇÕES (POST, PUT & DELETE) ---
+
+      // Cadastro (POST) - DUAS ETAPAS (Medicamento -> Estoque)
+      document
+        .getElementById("formCadastro")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const qtdInicial = parseInt(form.quantidade.value) || 0;
+
+          // 1. Payload do Medicamento (SEM quantidade)
+          const payloadMed = {
+            nome: form.nome.value,
+            ean: form.ean.value,
+            laboratorio: form.laboratorio.value,
+            principio_ativo: form.principio_ativo.value,
+            composicao: form.composicao.value,
+            forma_administracao: form.forma_administracao.value,
+            armazenamento: form.armazenamento.value,
+            para_que_serve: form.para_que_serve.value,
+            contraindicacao: form.contraindicacao.value,
+            dosagem: form.dosagem.value,
+          };
+
+          try {
+            // Etapa 1: Criar Medicamento
+            const resMed = await fetch(`${API_BASE_URL}/medicamentos`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payloadMed),
+            });
+
+            if (!resMed.ok) {
+              const erro = await resMed.json();
+              throw new Error(erro.error || "Erro ao criar medicamento.");
+            }
+
+            const novoMed = await resMed.json();
+
+            // Etapa 2: Criar Estoque (se quantidade > 0)
+            if (qtdInicial > 0 && novoMed.id) {
+              const payloadEstoque = {
+                medicamento_id: novoMed.id,
+                quantidade: qtdInicial,
+              };
+
+              // Tenta criar o estoque. Se falhar, avisa mas não bloqueia o fluxo principal.
+              try {
+                await fetch(`${API_BASE_URL}/estoque`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payloadEstoque),
+                });
+              } catch (errEstoque) {
+                console.warn("Falha ao criar estoque inicial:", errEstoque);
+                alert(
+                  "Medicamento criado, mas houve erro ao definir o estoque inicial."
+                );
+              }
+            }
+
+            alert(`Medicamento "${novoMed.nome}" cadastrado com sucesso!`);
+            await carregarDadosAPI();
+            showScreen("painel");
+          } catch (error) {
+            console.error(error);
+            alert(error.message);
+          }
+        });
+
+      function abrirEdicao(id) {
+        const med = dbMedicamentos.find((m) => m.id === id);
+        if (!med) return;
+
+        const form = document.getElementById("formAtualizar");
+        document.getElementById("update-med-name").innerText = med.nome;
+
+        // Preenche campos do formulário de atualização
+        form.id.value = med.id;
+        form.nome.value = med.nome;
+        form.ean.value = med.ean;
+        form.laboratorio.value = med.lab;
+        form.principio.value = med.principio;
+        form.quantidade.value = med.qtd;
+
+        // Novos campos (preenchidos com dados do GET, se existirem)
+        form.composicao_upd.value = med.composicao || "";
+        form.forma_administracao_upd.value = med.forma_administracao || "";
+        form.armazenamento_upd.value = med.armazenamento || "";
+        form.categoria_upd.value = med.categoria || "";
+
+        showScreen("atualizacao");
+      }
+
+      async function deletarMedicamento(id, nome) {
+        const confirmacao = confirm(
+          `Tem certeza que deseja excluir permanentemente o medicamento:\n"${nome}"?\n(Isso pode falhar se houver estoque vinculado!)`
+        );
+
+        if (!confirmacao) return;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/medicamentos/${id}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            alert("Medicamento excluído com sucesso!");
+            await carregarDadosAPI();
+          } else {
+            const erro = await response.json();
+            alert(
+              "Não foi possível excluir:\n" +
+                (erro.error || "Erro desconhecido")
+            );
+          }
+        } catch (error) {
+          console.error(error);
+          alert("Erro de conexão ao tentar excluir.");
+        }
+      }
+
+      document
+        .getElementById("formAtualizar")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const id = parseInt(form.id.value);
+
+          // Payload de PUT (Atualização)
+          const payload = {
+            nome: form.nome.value,
+            ean: form.ean.value,
+            laboratorio: form.laboratorio.value,
+            principio_ativo: form.principio.value,
+            // Incluindo os campos obrigatórios conhecidos
+            composicao: form.composicao_upd.value,
+            forma_administracao: form.forma_administracao_upd.value,
+            armazenamento: form.armazenamento_upd.value,
+            dosagem: form.categoria_upd.value,
+          };
+
+          try {
+            const response = await fetch(`${API_BASE_URL}/medicamentos/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+              alert("Atualizado com sucesso!");
+              await carregarDadosAPI();
+              showScreen("painel");
+            } else {
+              const erro = await response.json();
+              alert(
+                "Erro ao atualizar: " + (erro.error || "Erro desconhecido")
+              );
+            }
+          } catch (error) {
+            console.error(error);
+            alert("Erro de conexão ao tentar salvar.");
+          }
+        });
+
+      // --- 6. VALIDAÇÃO E ENVIO DO PERFIL ---
+      document.getElementById("formPerfil").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const nomeInput = document.getElementById("profileNome");
+        const emailInput = document.getElementById("profileEmail");
+        const senhaInput = document.getElementById("profilePass");
+        const confirmaInput = document.getElementById("profileConfirmPass");
+
+        const nome = nomeInput.value.trim();
+        const email = emailInput.value.trim();
+        const senha = senhaInput.value;
+        const confirma = confirmaInput.value;
+
+        let erros = [];
+
+        // Validação Nome
+        if (nome.length < 3) {
+          erros.push("O nome de usuário deve ter pelo menos 3 caracteres.");
+        }
+
+        // Validação E-mail (Regex simples)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          erros.push("Por favor, insira um e-mail válido.");
+        }
+
+        // Validação Senha (se preenchida)
+        if (senha.length > 0) {
+          if (senha.length < 6) {
+            erros.push("A senha deve ter no mínimo 6 caracteres.");
+          }
+          if (senha !== confirma) {
+            erros.push("As senhas não coincidem.");
+          }
+        }
+
+        if (erros.length > 0) {
+          alert("Erro ao salvar perfil:\n\n- " + erros.join("\n- "));
+          return;
+        }
+
+        // Se passar na validação:
+        alert("Perfil atualizado com sucesso!");
+
+        // Atualiza visualmente o nome na Sidebar
+        document.getElementById("sidebarUserName").innerText = nome;
+
+        // Limpa campos de senha
+        senhaInput.value = "";
+        confirmaInput.value = "";
+      });
+
+    
+      function atualizarEstatisticas() {
+        document.getElementById("stat-total").innerText = dbMedicamentos.length;
+        document.getElementById("stat-critico").innerText =
+          dbMedicamentos.filter((m) => m.status === "Repor").length;
+        document.getElementById("stat-unidades").innerText =
+          dbMedicamentos.reduce((acc, curr) => acc + parseInt(curr.qtd), 0);
+      }
+
+      function toggleTheme(mode) {
+        if (mode === "light") {
+          document.body.classList.add("light-mode");
+          document.getElementById("checkDark").checked = false;
+          document.getElementById("checkLight").checked = true;
+        } else {
+          document.body.classList.remove("light-mode");
+          document.getElementById("checkLight").checked = false;
+          document.getElementById("checkDark").checked = true;
+        }
+      }
+
+      // Listeners
+      document
+        .getElementById("inputBuscaPrincipal")
+        .addEventListener("keyup", (e) => renderListaBusca(e.target.value));
+      document
+        .getElementById("inputBuscaPainel")
+        .addEventListener("keyup", (e) => renderTabelaPainel(e.target.value));
+
+      // Inicialização
+      document.addEventListener("DOMContentLoaded", () => {
+        carregarDadosAPI();
+      });
+    </script>
+  </body>
+</html>
